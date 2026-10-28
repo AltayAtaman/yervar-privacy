@@ -110,13 +110,13 @@
       Uygulamamız, temel işlevlerini sunabilmek amacıyla cihazınızın hassas ve yaklaşık konum erişim izinlerini (<code>ACCESS_FINE_LOCATION</code>, <code>ACCESS_COARSE_LOCATION</code>) kullanır.
     </p>
     <div class="notice">
-      <strong>Önemli İlke:</strong> Konum verileriniz yalnızca cihazınız üzerinde anlık olarak işlenir. Koordinatlarınız hiçbir uzak sunucuya kaydedilmez, saklanmaz ve üçüncü taraflara satılmaz veya devredilmez.
+      <strong>Önemli İlke:</strong> Konum verileriniz YerVar tarafından hiçbir kullanıcı hesabı veya cihaz kimliğiyle eşleştirilmez, kendi sunucularımızda saklanmaz ve üçüncü taraflara satılmaz.
     </div>
     <p>Konum veriniz yalnızca şu amaçlarla kullanılır:</p>
     <ul>
-      <li>Harita üzerinde size en yakın açık ve kapalı otoparkları mesafe sırasına göre listelemek.</li>
-      <li>Seçilen otoparka varış süresini hesaplamak ve navigasyon rotası çizmek.</li>
-      <li>"Aracımı Bul" özelliği ile park ettiğiniz araca yürüyerek dönüş yolunu göstermek.</li>
+      <li>Harita üzerinde size en yakın açık ve kapalı otoparkları mesafe sırasına göre listelemek (cihaz üzerinde).</li>
+      <li><strong>Canlı Sürüş Rotası Çizimi:</strong> Seçtiğiniz otoparka varış süresi ve rota geometrisini hesaplamak amacıyla, anonim başlangıç ve hedef koordinatları şifreli HTTPS üzerinden açık kaynak OSRM (<code>router.project-osrm.org</code>) yönlendirme servisine iletilir. Bu istekte hiçbir cihaz, kimlik veya kullanıcı verisi aktarılmaz.</li>
+      <li>"Aracımı Bul" özelliği ile park ettiğiniz araca yürüyerek dönüş yolunu cihazınız üzerinde göstermek.</li>
     </ul>
 
     <h2>3. Hesap ve Kimlik Bilgileri</h2>
@@ -131,25 +131,31 @@
 
     <h2>4. Cihaz Üzerinde Saklanan Tercihler (Local Storage)</h2>
     <p>
-      Kullanıcı deneyimini sağlamak için yalnızca cihazınızın kendi hafızasında (SharedPreferences) şu sınırlı tercihler tutulur:
+      Uygulama deneyimini korumak adına yalnızca cihazınızın kendi hafızasında (SharedPreferences) şu sınırlı veriler tutulur:
     </p>
     <ul>
-      <li>Seçtiğiniz tema (Koyu / Açık tema tercihi).</li>
-      <li>İlk açılış bilgilendirmesini onaylayıp onaylamadığınız.</li>
-      <li>Aktif bir park oturumu başlattıysanız; park saati, opsiyonel olarak yazdığınız park yeri notu (Örn: "Kat -2, B4") ve park konumu (sadece cihaz içinde).</li>
+      <li>Tema tercihi (Koyu Tema / Açık Tema).</li>
+      <li>İlk açılış bilgilendirme ekranının onay durumu.</li>
+      <li>Kullanıcı tarafından favorilere eklenen otopark kimlikleri (Favoriler listesi).</li>
+      <li>Son yapılan arama sorguları geçmişi (cihazda hızlı tamamlama için).</li>
+      <li>Aktif bir park oturumu başlattıysanız; park saati, opsiyonel olarak yazdığınız park yeri notu (Örn: "Kat -2, B4") ve park konumu.</li>
+      <li>Otopark doluluk bildirimi zaman sınırlaması (cooldown) ve yerel bildirim etiketleri.</li>
+      <li>Maç günü trafik bildirimleri için ESPN'den alınan fikstürlerin 12 saatlik yerel önbelleği.</li>
     </ul>
     <p>
-      Bu veriler hiçbir zaman internet üzerinden dışarı aktarılmaz; uygulama kaldırıldığında cihazınızdan tamamen silinir.
+      Bu veriler tamamen cihazınıza aittir, hiçbir uzak sunucuya aktarılmaz; uygulama kaldırıldığında cihazınızdan otomatik olarak silinir.
     </p>
 
     <h2>5. Üçüncü Taraf Servisler ve Bağımsızlık</h2>
     <p>
-      YerVar bağımsız bir rehberdir. Otopark işletmeleri, İSPARK veya belediyelerle resmi/ticari bir ortaklığı yoktur.
+      YerVar bağımsız bir rehberdir. Otopark işletmeleri, İSPARK veya belediyelerle resmi/ticari bir ortaklığı yoktur. Uygulamanın kullandığı harici servisler şunlardır:
     </p>
     <ul>
-      <li>Otopark doluluk ve tarife bilgileri kamuya açık veri kaynaklarından anlık olarak alınır.</li>
-      <li>Harita gösterimi için standart OpenStreetMap açık kaynak katmanları kullanılır.</li>
-      <li>"Konumu Paylaş" butonuna basıldığında, park konumu yalnızca kullanıcının onayıyla cihazda yüklü mesajlaşma uygulamaları (WhatsApp vb.) aracılığıyla paylaşılır.</li>
+      <li><strong>İBB Açık Veri Portalı (<code>api.ibb.gov.tr</code>):</strong> Kamuya açık İSPARK anlık doluluk ve tarife verilerini çekmek için salt-okunur (read-only) HTTPS çağrıları.</li>
+      <li><strong>CartoDB & OpenStreetMap (<code>basemaps.cartocdn.com</code>):</strong> Harita karo katmanları ve Kadıköy yaya bölgesi sınırlarının görselleştirilmesi.</li>
+      <li><strong>OSRM Project (<code>router.project-osrm.org</code>):</strong> Sürüş mesafesi ve rota poligonu hesaplamaları (yalnızca anonim koordinat aktarımı).</li>
+      <li><strong>ESPN Public Sports API (<code>site.api.espn.com</code>):</strong> Kadıköy Şükrü Saracoğlu Stadyumu ev sahibi maç günlerini ve maç saatlerini tespit etmek amacıyla kullanılan kamuya açık fikstür servisi.</li>
+      <li><strong>Dış Harita ve Mesajlaşma Yönlendirmeleri:</strong> Kullanıcı isteğine bağlı olarak otopark konumunu harici Google Maps uygulamasında açma veya "Aracımı Bul" koordinatını WhatsApp üzerinden yakınlarıyla paylaşma (yalnızca kullanıcı butona bastığında tetiklenir).</li>
     </ul>
 
     <h2>6. Çocukların Gizliliği</h2>
@@ -168,11 +174,12 @@
     <hr>
 
     <h2>Summary in English (For Google Play Reviewers)</h2>
-    <p><strong>YerVar</strong> is an independent parking navigation assistant for drivers.</p>
+    <p><strong>YerVar</strong> is an independent urban parking navigation assistant for drivers.</p>
     <ul>
-      <li><strong>Location Access:</strong> The app requests <code>ACCESS_FINE_LOCATION</code> and <code>ACCESS_COARSE_LOCATION</code> solely for real-time client-side navigation, finding nearby parking spots, and walking back to parked vehicles. Location data is processed strictly in-memory and is never stored, tracked, or shared.</li>
-      <li><strong>No User Accounts:</strong> No registration, login, phone number, or personal identity information is collected.</li>
-      <li><strong>No Tracking SDKs:</strong> The app does not include any third-party advertising or user profiling SDKs.</li>
+      <li><strong>Location Access:</strong> The app requests <code>ACCESS_FINE_LOCATION</code> and <code>ACCESS_COARSE_LOCATION</code> for finding nearby parking spots, displaying the user position, and walking back to parked vehicles. When a driving route is requested, anonymous start and destination coordinates are sent over HTTPS to the open-source OSRM routing engine (<code>router.project-osrm.org</code>) solely to calculate route geometry and travel duration. No user account, advertising ID, or device identifier is linked or stored.</li>
+      <li><strong>No User Accounts:</strong> No registration, login, phone number, email address, or license plate information is collected or required.</li>
+      <li><strong>No Tracking / Ad SDKs:</strong> No third-party advertising, profiling, or behavioral tracking SDKs are embedded in the app.</li>
+      <li><strong>Local Storage:</strong> Search history, favorite lots, UI theme preference, and local parking timer notes remain strictly on the user's device via local storage.</li>
       <li><strong>Contact:</strong> <a href="mailto:i.altay.ataman@gmail.com">i.altay.ataman@gmail.com</a></li>
     </ul>
 
